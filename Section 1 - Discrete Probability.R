@@ -20,7 +20,7 @@ balls <- rep(c("cyan", "magenta", "yellow"), times = c(3,5,7))
     mean(balls == "cyan") * mean(!balls == "cyan")
     3/15 * 12/15 #alternative
   
-#### Assessment: Intro to Discrete Probability (datacamp)
+#### Assessment: Intro to Discrete Probability (datacamp; same problems as edx only solved differently)
     
     cyan <- 3
     magenta <- 5
@@ -44,4 +44,8 @@ balls <- rep(c("cyan", "magenta", "yellow"), times = c(3,5,7))
     p_1 * p_2
     
   ###### Section 1.2: Combinations and permutations ######
+    
+    
+    
+
     
