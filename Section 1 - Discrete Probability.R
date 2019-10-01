@@ -45,7 +45,7 @@ balls <- rep(c("cyan", "magenta", "yellow"), times = c(3,5,7))
     p_2 <- (magenta + yellow)/(cyan + magenta + yellow)
     p_1 * p_2
     
-  ###### Section 1.2: Combinations and permutations ######
+###### Section 1.2: Combinations and permutations ######
 library(gtools)  
     
   #Q2: You've drawn 5 balls from a box that has 3 cyan balls, 5 magenta balls, and 7 yellow balls, with replacement, and all have been yellow.
@@ -86,3 +86,70 @@ celtic_wins <- replicate(B, {
   any(simulated_games == "win")
 })
 mean(celtic_wins)
+
+###### Section 1.3: Addition rule and Monty Hall ######
+
+  #Two teams, say the Cavs and the Warriors, are playing a seven game championship series. The first to win four games wins the series. 
+  #The teams are equally good, so they each have a 50-50 chance of winning each game.
+
+  #Q1: If the Cavs lose the first game, what is the probability that they win the series?
+
+  #Initial answer
+n<-6
+outcomes<-c(0,1)
+l<-list(outcomes)
+l<-rep(l, times = n)
+l<-expand.grid(l)
+mean(rowSums(l) >= 4)
+
+  #alternative answer I thought of while attempting Q2
+outcomes<-c(0,1)
+games<-permutations(2,6, v = outcomes, repeats.allowed = TRUE)
+mean(rowSums(games) >= 4)
+
+  #Q2: Confirm the results of the previous question with a Monte Carlo simulation to estimate the probability of the Cavs winning the series
+      #after losing the first game.
+
+B<-10000
+set.seed(1)
+results<-replicate(B,{
+  outcomes<-c(0,1)
+  games<-sample(outcomes,6, replace = TRUE)
+  sum(games) >= 4
+  })
+mean(results)
+
+  #Q3: Teams A and B are playing a seven series game series. Team A is better than team B and has p > .5 chance of winning each game.
+      #Assign the variable 'p' as the vector of probabilities that team A will win.
+p <- seq(0.5, 0.95, 0.025)
+      #Given a value 'p', the probability of winning the series for the underdog team B can be computed with the following function:
+prob_win <- function(p){
+  B <- 10000
+  result <- replicate(B, {
+    b_win <- sample(c(1,0), 7, replace = TRUE, prob = c(1-p, p))
+    sum(b_win)>=4
+  })
+  mean(result)
+}
+      #Apply the 'prob_win' function across the vector of probabilities that team A will win to determine the probability that team B will win.
+Pr <- sapply(p, prob_win)
+
+      #Plot the probability 'p' on the x-axis and 'Pr' on the y-axis.
+plot(p, Pr)
+
+  #Q4:Repeat the previous exercise, but keep the probability that team A wins fixed at p <- 0.75 and compute the probability for 
+      #different series lengths. For example, wins in best of 1 game, 3 games, 5 games, and so on through a series that lasts 25 games.
+
+N<-seq(1,25,2)
+
+prob_win <- function(N, p=0.75){
+  B <- 10000
+  result <- replicate(B, {
+    b_win <- sample(c(1,0), N, replace = TRUE, prob = c(1-p, p))
+    sum(b_win)>=(N+1)/2
+  })
+  mean(result)
+}
+
+Pr <- sapply(N, prob_win)
+plot(N,Pr)
