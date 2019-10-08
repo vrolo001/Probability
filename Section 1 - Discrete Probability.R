@@ -260,3 +260,69 @@ total_meals <- sapply(n, meals)
 data.frame(sides = n, meals = total_meals) %>%
   filter(meals > 365) %>%
   min(.$sides)
+
+### Question 3 and 4: Esophageal cancer and alcohol/tobacco use, part 1
+
+#Case-control studies help determine whether certain exposures are associated with outcomes such as developing cancer. 
+#The built-in dataset esoph contains data from a case-control study in France comparing people with esophageal cancer 
+#(cases, counted in ncases) to people without esophageal cancer (controls, counted in ncontrols) that are carefully matched on a 
+#variety of demographic and medical characteristics. The study compares alcohol intake in grams per day (alcgp) and tobacco intake
+#in grams per day (tobgp) across cases and controls grouped by age range (agegp).
+
+  #3a: How many groups are in the study?
+
+
+agegp <- nlevels(esoph$agegp) #while the possible number of combinations is the multiplication of the levels of all factor variables,
+alcgp <- nlevels(esoph$alcgp) #the dataset does not have data points for all of these possible cobinations. Upon observing the
+tobgp <- nlevels(esoph$tobgp) #data with commands such as view(esoph), it becomes clear there is only one datum point for only some
+                              #combinations. This, using the nrow command would show the number of possible combinations for which we
+groups <- agegp*alcgp*tobgp   #do have at least one datum.
+nrow(esoph)
+
+  #3b: How many cases are there? Save this value as all_cases
+
+all_cases <- sum(esoph$ncontrols)
+
+  #4a: What is the probability that a subject in the highest alcohol consumption group is a cancer case?
+
+  #My answer
+
+esoph_high <- esoph %>%
+  filter(alcgp == "120+")
+sum(esoph_high$ncases)/sum (sum(esoph_high$ncases), sum(esoph_high$ncontrols))
+
+  #Course answer
+
+esoph %>%
+  filter(alcgp == "120+") %>%
+  summarize(ncases = sum(ncases), ncontrols = sum(ncontrols)) %>%
+  mutate(p_case = ncases / (ncases + ncontrols)) %>%
+  pull(p_case)
+
+  #4b: What is the probability that a subject in the lowest alcohol consumption group is a cancer case?
+
+esoph %>%
+  filter(alcgp == "0-39g/day") %>%
+  summarize(ncases = sum(ncases), ncontrols = sum(ncontrols)) %>%
+  mutate(p_case = ncases / (ncases + ncontrols)) %>%
+  pull(p_case)
+
+  #4c: Given that a person is a case, what is the probability that they smoke 10g or more a day?
+
+esoph %>%
+  filter(!ncases == 0) %>%
+  summarize(tobgp_10 = sum(ncases[!tobgp == "0-9g/day"]),
+            tobgp = sum(ncases)) %>%
+  mutate(p_smoke = tobgp_10/tobgp) %>%
+  pull(p_smoke)
+
+  
+  #4d: Given that a person is a control, what is the probability that they smoke 10g or more a day?
+
+esoph %>%
+  summarize(tobgp_10 = sum(ncontrols[!tobgp == "0-9g/day"]),
+            tobgp = sum(ncontrols)) %>%
+  mutate(p_smoke = tobgp_10/tobgp) %>%
+  pull(p_smoke)
+
+
