@@ -279,7 +279,11 @@ nrow(esoph)
 
   #3b: How many cases are there? Save this value as all_cases
 
-all_cases <- sum(esoph$ncontrols)
+all_cases <- sum(esoph$ncases)
+
+  #3c: How many controls are there? Save this value as all_controls
+
+all_controls <- sum(esoph$ncontrols)
 
   #4a: What is the probability that a subject in the highest alcohol consumption group is a cancer case?
 
