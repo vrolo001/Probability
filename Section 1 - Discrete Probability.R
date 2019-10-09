@@ -158,7 +158,6 @@ library(gtools)
 library(tidyverse)
 options(digits = 3)
 
-
 ### Question 1: Olympic running
 
 #In the 200m dash finals in the Olympics, 8 runners compete for 3 medals (order matters). In the 2012 Olympics, 3 of 8 runners
@@ -271,7 +270,6 @@ data.frame(sides = n, meals = total_meals) %>%
 
   #3a: How many groups are in the study?
 
-
 agegp <- nlevels(esoph$agegp) #while the possible number of combinations is the multiplication of the levels of all factor variables,
 alcgp <- nlevels(esoph$alcgp) #the dataset does not have data points for all of these possible cobinations. Upon observing the
 tobgp <- nlevels(esoph$tobgp) #data with commands such as view(esoph), it becomes clear there is only one datum point for only some
@@ -316,7 +314,6 @@ esoph %>%
   mutate(p_smoke = tobgp_10/tobgp) %>%
   pull(p_smoke)
 
-  
   #4d: Given that a person is a control, what is the probability that they smoke 10g or more a day?
 
 esoph %>%
@@ -325,4 +322,80 @@ esoph %>%
   mutate(p_smoke = tobgp_10/tobgp) %>%
   pull(p_smoke)
 
+### Question 5 and 6: Esophageal cancer and alcohol/tobacco use, part 2
 
+  #5a: For cases, what is the probability of being in the highest alcohol group?
+
+  #My answer
+p_top_alc <- esoph %>%
+  summarize(top_al = sum(ncases[alcgp == "120+"]),
+            tot_al = sum(ncases)) %>%
+  mutate(prob_top_al = top_al/tot_al) %>%
+  pull(prob_top_al)
+  
+  #course answer
+high_alc_cases <- esoph %>%
+  filter(alcgp == "120+") %>%
+  pull(ncases) %>%
+  sum()
+p_case_high_alc <- high_alc_cases/all_cases
+
+  #5b: For cases, what is the probability of being in the highest tobacco group?
+
+p_top_tob <- esoph %>%
+  summarize(top_tob = sum(ncases[tobgp == "30+"]),
+            tot_tob = sum(ncases)) %>%
+  mutate(prob_top_tob = top_tob/tot_tob) %>%
+  pull(prob_top_tob)
+
+  #5c: For cases, what is the probability of being in the highest alcohol group AND the highest tobacco group?
+        #Probability of both highest alcohol and highest tobacco divided by total ncases
+
+cases_both <- esoph %>%
+  filter(alcgp == "120+" & tobgp == "30+") %>%
+  summarize(cases_both = sum(ncases)) %>%
+  pull(cases_both)
+
+p_alc_tob <- cases_both/sum(esoph$ncases)
+
+  #5d: For cases, what is the probability of being in the highest alcohol group OR the highest tobacco group?
+        #Pr(A or B) = Pr(A)+Pr(B)-Pr(A & B)
+
+p_either <- p_top_alc + p_top_tob - p_alc_tob
+
+  #6a: For controls, what is the probability of being in the highest alcohol group?
+
+p_top_alc_control <- esoph %>%
+  summarize(top_al = sum(ncontrols[alcgp == "120+"]),
+            tot_al = sum(ncontrols)) %>%
+  mutate(prob_top_al = top_al/tot_al) %>%
+  pull(prob_top_al)
+
+  #6b: How many times more likely are cases than controls to be in the highest alcohol group?
+
+p_top_alc/p_top_alc_control
+
+  #6c: For controls, what is the probability of being in the highest tobacco group?
+
+p_top_tob_control <- esoph %>%
+  summarize(top_tob = sum(ncontrols[tobgp == "30+"]),
+            tot_tob = sum(ncontrols)) %>%
+  mutate(prob_top_tob = top_tob/tot_tob) %>%
+  pull(prob_top_tob)
+
+  #6d: For controls, what is the probability of being in the highest alcohol group AND the highest tobacco group?
+
+cases_both_control <- esoph %>%
+  filter(alcgp == "120+" & tobgp == "30+") %>%
+  summarize(cases_both = sum(ncontrols)) %>%
+  pull(cases_both)
+
+p_alc_tob_control <- cases_both_control/sum(esoph$ncontrols)
+
+  #6e: For controls, what is the probability of being in the highest alcohol group OR the highest tobacco group?
+
+p_either_control <- p_top_alc_control + p_top_tob_control - p_alc_tob_control
+
+  #6f: How many times more likely are cases than controls to be in the highest alcohol group or the highest tobacco group?
+
+p_either/p_either_control
