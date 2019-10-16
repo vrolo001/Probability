@@ -191,7 +191,7 @@ sample_data <- function(p){
   n <- 44
   mu <- n * (a*p + b*(1-p))
   se <- sqrt(n) * abs(b-a) * sqrt(p*(1-p))
-  higher_35 <- 1-pnorm(35, mu, se )
+  higher_35 <- 1-pnorm(35, mu, se)
 }
 
 probs <- sapply(p, sample_data)
